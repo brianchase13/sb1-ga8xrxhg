@@ -1,14 +1,15 @@
 import React from 'react';
-import { Clock, Check, X, Minus, TrendingUp, TrendingDown } from 'lucide-react';
+import { Clock, Check, X, Minus, TrendingUp, TrendingDown, Share2 } from 'lucide-react';
 import type { Bet } from '../../types';
 import { formatOdds, formatCurrency } from '../../utils/bettingCalculations';
 
 interface BetCardProps {
   bet: Bet;
   compact?: boolean;
+  onShare?: (bet: Bet) => void;
 }
 
-const BetCard: React.FC<BetCardProps> = ({ bet, compact = false }) => {
+const BetCard: React.FC<BetCardProps> = ({ bet, compact = false, onShare }) => {
   const statusConfig = {
     pending: {
       icon: Clock,
@@ -76,9 +77,23 @@ const BetCard: React.FC<BetCardProps> = ({ bet, compact = false }) => {
           <h3 className="text-sm font-bold text-dark-100 mb-1">{bet.event}</h3>
           <p className="text-xs text-dark-300">{bet.sportsbook}</p>
         </div>
-        <div className={`flex items-center space-x-1 px-2 py-1 rounded-md ${config.bg}`}>
-          <StatusIcon className={`h-3 w-3 ${config.color}`} />
-          <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
+        <div className="flex items-center space-x-2">
+          <div className={`flex items-center space-x-1 px-2 py-1 rounded-md ${config.bg}`}>
+            <StatusIcon className={`h-3 w-3 ${config.color}`} />
+            <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
+          </div>
+          {onShare && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onShare(bet);
+              }}
+              className="p-1.5 hover:bg-dark-800 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+              title="Share bet"
+            >
+              <Share2 className="h-4 w-4 text-dark-400 hover:text-primary-400" />
+            </button>
+          )}
         </div>
       </div>
 

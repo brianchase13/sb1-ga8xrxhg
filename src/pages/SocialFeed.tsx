@@ -1,9 +1,27 @@
-import React from 'react';
-import { Heart, MessageCircle, Share2, TrendingUp, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { Heart, MessageCircle, Share2, TrendingUp, Star, Users } from 'lucide-react';
 import { mockSocialBets } from '../utils/mockData';
 import { formatOdds, formatCurrency } from '../utils/bettingCalculations';
+import TailModal from '../components/shared/TailModal';
+import ShareBetModal from '../components/shared/ShareBetModal';
+import type { User, Bet } from '../types';
 
 function SocialFeed() {
+  const [selectedExpert, setSelectedExpert] = useState<User | null>(null);
+  const [selectedBet, setSelectedBet] = useState<Bet | null>(null);
+  const [isTailModalOpen, setIsTailModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const handleTailExpert = (expert: User) => {
+    setSelectedExpert(expert);
+    setIsTailModalOpen(true);
+  };
+
+  const handleShareBet = (bet: Bet, userName: string) => {
+    setSelectedBet(bet);
+    setIsShareModalOpen(true);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -64,9 +82,20 @@ function SocialFeed() {
                   <span>{socialBet.user.followersCount.toLocaleString()} followers</span>
                 </div>
               </div>
-              <button className="px-4 py-2 bg-primary-900/40 border border-primary-800/50 rounded-lg text-primary-400 text-sm font-medium hover:bg-primary-900/60 transition-all">
-                Follow
-              </button>
+              <div className="flex items-center space-x-2">
+                <button className="px-4 py-2 bg-dark-800 border border-dark-700 rounded-lg text-dark-200 text-sm font-medium hover:bg-dark-700 transition-all">
+                  Follow
+                </button>
+                {socialBet.user.isExpert && (
+                  <button
+                    onClick={() => handleTailExpert(socialBet.user)}
+                    className="px-4 py-2 bg-gold-gradient rounded-lg text-dark-900 text-sm font-bold hover:shadow-glow-gold transition-all flex items-center space-x-1"
+                  >
+                    <Users className="h-4 w-4" />
+                    <span>Tail</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Caption */}
@@ -129,18 +158,47 @@ function SocialFeed() {
                   <MessageCircle className="h-5 w-5" />
                   <span className="text-sm font-medium">{socialBet.comments}</span>
                 </button>
-                <button className="flex items-center space-x-2 text-dark-400 hover:text-primary-400 transition-colors">
+                <button
+                  onClick={() => handleShareBet(socialBet.bet, socialBet.user.displayName)}
+                  className="flex items-center space-x-2 text-dark-400 hover:text-primary-400 transition-colors"
+                >
                   <Share2 className="h-5 w-5" />
                   <span className="text-sm font-medium">{socialBet.shares}</span>
                 </button>
               </div>
-              <button className="px-4 py-2 bg-gold-gradient rounded-lg text-sm font-bold text-dark-900 hover:shadow-glow-gold transition-all">
+              <button
+                onClick={() => handleShareBet(socialBet.bet, socialBet.user.displayName)}
+                className="px-4 py-2 bg-gold-gradient rounded-lg text-sm font-bold text-dark-900 hover:shadow-glow-gold transition-all"
+              >
                 Copy Bet
               </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Modals */}
+      {selectedExpert && (
+        <TailModal
+          isOpen={isTailModalOpen}
+          onClose={() => {
+            setIsTailModalOpen(false);
+            setSelectedExpert(null);
+          }}
+          expert={selectedExpert}
+        />
+      )}
+      {selectedBet && (
+        <ShareBetModal
+          isOpen={isShareModalOpen}
+          onClose={() => {
+            setIsShareModalOpen(false);
+            setSelectedBet(null);
+          }}
+          bet={selectedBet}
+          userName={mockSocialBets.find((sb) => sb.bet.id === selectedBet.id)?.user.displayName || 'SharpBet Pro User'}
+        />
+      )}
     </div>
   );
 }

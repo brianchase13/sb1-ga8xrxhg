@@ -9,6 +9,8 @@ import SocialFeed from './pages/SocialFeed';
 import AIPicks from './pages/AIPicks';
 import Bankroll from './pages/Bankroll';
 import Sportsbooks from './pages/Sportsbooks';
+import ExpertEarnings from './pages/ExpertEarnings';
+import Friends from './pages/Friends';
 import { ToastProvider } from './components/shared/Toast';
 import FloatingActionButton from './components/shared/FloatingActionButton';
 import QuickBetModal from './components/shared/QuickBetModal';
@@ -47,6 +49,8 @@ function AppContent() {
           <Route path="/ai-picks" element={<AIPicks />} />
           <Route path="/bankroll" element={<Bankroll />} />
           <Route path="/sportsbooks" element={<Sportsbooks />} />
+          <Route path="/earnings" element={<ExpertEarnings />} />
+          <Route path="/friends" element={<Friends />} />
         </Routes>
 
         {/* Global Components */}

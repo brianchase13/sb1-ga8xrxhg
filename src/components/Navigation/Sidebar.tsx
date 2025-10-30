@@ -7,7 +7,9 @@ import {
   Scale,
   Sparkles,
   Wallet,
-  Link as LinkIcon
+  Link as LinkIcon,
+  UserPlus,
+  Crown
 } from 'lucide-react';
 import NavLink from './NavLink';
 
@@ -17,10 +19,12 @@ const navigationItems = [
   { href: '/odds', icon: Scale, text: 'Line Shopping' },
   { href: '/analytics', icon: LineChart, text: 'Analytics' },
   { href: '/social', icon: Users, text: 'Social Feed' },
+  { href: '/friends', icon: UserPlus, text: 'Friends' },
   { href: '/ai-picks', icon: Sparkles, text: 'AI Picks' },
+  { href: '/earnings', icon: Crown, text: 'Expert Earnings', badge: 'PRO' },
   { href: '/bankroll', icon: Wallet, text: 'Bankroll' },
   { href: '/sportsbooks', icon: LinkIcon, text: 'Sportsbooks' },
-];
+] as const;
 
 const Sidebar: React.FC = () => {
   return (
@@ -32,6 +36,7 @@ const Sidebar: React.FC = () => {
             href={item.href}
             icon={item.icon}
             text={item.text}
+            badge={item.badge}
           />
         ))}
       </nav>

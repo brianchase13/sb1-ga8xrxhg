@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { Filter, Plus } from 'lucide-react';
 import BetCard from '../components/shared/BetCard';
+import ShareBetModal from '../components/shared/ShareBetModal';
 import { mockBets } from '../utils/mockData';
-import type { BetStatus, SportType } from '../types';
+import type { BetStatus, SportType, Bet } from '../types';
 
 function MyBets() {
   const [filterStatus, setFilterStatus] = useState<BetStatus | 'all'>('all');
   const [filterSport, setFilterSport] = useState<SportType | 'all'>('all');
+  const [selectedBet, setSelectedBet] = useState<Bet | null>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const handleShareBet = (bet: Bet) => {
+    setSelectedBet(bet);
+    setIsShareModalOpen(true);
+  };
 
   const filteredBets = mockBets.filter((bet) => {
     if (filterStatus !== 'all' && bet.status !== filterStatus) return false;
@@ -80,7 +88,7 @@ function MyBets() {
       {/* Bets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredBets.map((bet) => (
-          <BetCard key={bet.id} bet={bet} />
+          <BetCard key={bet.id} bet={bet} onShare={handleShareBet} />
         ))}
       </div>
 
@@ -88,6 +96,19 @@ function MyBets() {
         <div className="text-center py-12">
           <p className="text-dark-400">No bets found with the selected filters</p>
         </div>
+      )}
+
+      {/* Share Modal */}
+      {selectedBet && (
+        <ShareBetModal
+          isOpen={isShareModalOpen}
+          onClose={() => {
+            setIsShareModalOpen(false);
+            setSelectedBet(null);
+          }}
+          bet={selectedBet}
+          userName="You"
+        />
       )}
     </div>
   );

@@ -6,9 +6,10 @@ interface NavLinkProps {
   href: string;
   icon: LucideIcon;
   text: string;
+  badge?: string;
 }
 
-const NavLink: React.FC<NavLinkProps> = ({ href, icon: Icon, text }) => {
+const NavLink: React.FC<NavLinkProps> = ({ href, icon: Icon, text, badge }) => {
   const location = useLocation();
   const isActive = location.pathname === href;
 
@@ -27,7 +28,12 @@ const NavLink: React.FC<NavLinkProps> = ({ href, icon: Icon, text }) => {
         }`}
       />
       <span>{text}</span>
-      {isActive && (
+      {badge && (
+        <span className="ml-auto px-2 py-0.5 bg-gold-gradient rounded text-[10px] font-bold text-dark-900">
+          {badge}
+        </span>
+      )}
+      {!badge && isActive && (
         <div className="ml-auto h-2 w-2 rounded-full bg-primary-400 animate-pulse"></div>
       )}
     </Link>
