@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { Plus, TrendingUp, Zap, BarChart3, X } from 'lucide-react';
+import { Plus, TrendingUp, Zap, Calculator, X } from 'lucide-react';
 
 interface FloatingActionButtonProps {
   onQuickBet: () => void;
+  onKellyCalc?: () => void;
 }
 
-const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({ onQuickBet }) => {
+const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({ onQuickBet, onKellyCalc }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const actions = [
     { icon: TrendingUp, label: 'Quick Bet', color: 'bg-gold-500', action: onQuickBet },
-    { icon: Zap, label: 'Scan Arbs', color: 'bg-primary-500', action: () => {} },
-    { icon: BarChart3, label: 'Analytics', color: 'bg-dark-600', action: () => {} },
+    { icon: Calculator, label: 'Kelly Calc', color: 'bg-primary-500', action: onKellyCalc || (() => {}) },
+    { icon: Zap, label: 'Scan Arbs', color: 'bg-accent-500', action: () => {} },
   ];
 
   return (
