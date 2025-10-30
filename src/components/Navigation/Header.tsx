@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingUp, Search, Bell, User } from 'lucide-react';
 import { mockCurrentUser } from '../../utils/mockData';
+import MobileMenu from './MobileMenu';
 
 const Header: React.FC = () => {
   return (
@@ -8,7 +9,8 @@ const Header: React.FC = () => {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center space-x-3">
+            <MobileMenu />
             <div className="flex items-center space-x-2 group cursor-pointer">
               <div className="bg-gold-gradient p-2 rounded-xl shadow-glow-gold transition-transform group-hover:scale-105">
                 <TrendingUp className="h-6 w-6 text-dark-900" />

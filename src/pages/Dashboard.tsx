@@ -9,9 +9,14 @@ import {
   ArrowRight,
   Sparkles,
   Scale,
+  Bell,
+  Copy,
 } from 'lucide-react';
 import StatsCard from '../components/shared/StatsCard';
 import BetCard from '../components/shared/BetCard';
+import LiveIndicator from '../components/shared/LiveIndicator';
+import Tooltip from '../components/shared/Tooltip';
+import { useToast } from '../components/shared/Toast';
 import {
   mockCurrentUser,
   mockBets,
@@ -25,6 +30,7 @@ import { formatCurrency, formatOdds, formatPercentage } from '../utils/bettingCa
 function Dashboard() {
   const stats = mockCurrentUser.stats;
   const pendingBets = mockBets.filter((bet) => bet.status === 'pending');
+  const { showToast } = useToast();
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -86,100 +92,199 @@ function Dashboard() {
 
       {/* Arbitrage Opportunities - HIGH PRIORITY */}
       {mockArbitrageOpportunities.length > 0 && (
-        <div className="bg-gold-900/20 border border-gold-700/50 rounded-xl p-5 animate-pulse-slow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <Zap className="h-5 w-5 text-gold-400" />
-              <h2 className="text-lg font-bold text-gold-400">Arbitrage Opportunities</h2>
-              <span className="px-2 py-1 bg-gold-500 text-dark-900 text-xs font-bold rounded">
-                {mockArbitrageOpportunities.length} LIVE
-              </span>
-            </div>
-            <button className="text-sm text-gold-400 hover:text-gold-300 font-medium">
-              View All →
-            </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mockArbitrageOpportunities.slice(0, 2).map((arb) => (
-              <div
-                key={arb.id}
-                className="bg-dark-900/50 rounded-lg p-4 border border-gold-800/30"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="text-xs text-dark-400 uppercase mb-1">{arb.sportType}</div>
-                    <h3 className="text-sm font-bold text-dark-100">{arb.event}</h3>
+        <div className="bg-gold-900/20 border border-gold-700/50 rounded-xl p-5 relative overflow-hidden">
+          {/* Animated background effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold-500/5 to-transparent animate-shimmer"></div>
+
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gold-500/20 rounded-lg">
+                  <Zap className="h-5 w-5 text-gold-400" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <h2 className="text-lg font-bold text-gold-400">Arbitrage Opportunities</h2>
+                    <Tooltip content="Guaranteed profit opportunities where you can bet on all outcomes and win regardless of the result">
+                      <span className="cursor-help">ℹ️</span>
+                    </Tooltip>
                   </div>
-                  <div className="text-right">
-                    <div className="text-xs text-dark-400">Profit</div>
-                    <div className="text-lg font-bold text-gold-400">+{arb.profit}%</div>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <LiveIndicator size="sm" />
+                    <span className="text-xs text-dark-400">{mockArbitrageOpportunities.length} active</span>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  {arb.bets.map((bet, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between text-xs bg-dark-800/50 rounded p-2"
-                    >
-                      <span className="text-dark-300">{bet.sportsbook}</span>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-dark-200 font-medium">{bet.pick}</span>
-                        <span className="text-gold-400">{formatOdds(bet.odds)}</span>
-                        <span className="text-dark-400">{formatCurrency(bet.stake)}</span>
+              </div>
+              <button
+                onClick={() => showToast('info', 'Coming Soon', 'Full arbitrage scanner launching soon!')}
+                className="text-sm text-gold-400 hover:text-gold-300 font-medium flex items-center space-x-1"
+              >
+                <span>View All</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {mockArbitrageOpportunities.slice(0, 2).map((arb) => (
+                <div
+                  key={arb.id}
+                  className="bg-dark-900/50 backdrop-blur-sm rounded-lg p-4 border border-gold-800/30 hover:border-gold-700/50 transition-all group"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="text-xs text-dark-400 uppercase">{arb.sportType}</span>
+                        <LiveIndicator size="sm" label="" />
+                      </div>
+                      <h3 className="text-sm font-bold text-dark-100">{arb.event}</h3>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center space-x-1">
+                        <span className="text-xs text-dark-400">Profit</span>
+                        <Tooltip content="Guaranteed profit percentage after placing all required bets">
+                          <span className="cursor-help text-xs">ℹ️</span>
+                        </Tooltip>
+                      </div>
+                      <div className="text-xl font-bold text-gold-400 animate-pulse">
+                        +{arb.profit}%
                       </div>
                     </div>
-                  ))}
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    {arb.bets.map((bet, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between text-xs bg-dark-800/50 rounded p-2 hover:bg-dark-800/70 transition-colors"
+                      >
+                        <span className="text-dark-300 font-medium">{bet.sportsbook}</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-dark-200 font-medium">{bet.pick}</span>
+                          <span className="text-gold-400 font-bold">{formatOdds(bet.odds)}</span>
+                          <span className="text-dark-400">{formatCurrency(bet.stake)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => showToast('success', 'Copied!', 'Arbitrage details copied to clipboard')}
+                      className="flex-1 py-2 bg-dark-800 hover:bg-dark-700 border border-dark-700 rounded-lg text-sm font-medium text-dark-200 transition-all flex items-center justify-center space-x-2 group-hover:scale-105"
+                    >
+                      <Copy className="h-4 w-4" />
+                      <span>Copy</span>
+                    </button>
+                    <button
+                      onClick={() => showToast('info', 'Executing...', 'This feature connects to your sportsbook accounts')}
+                      className="flex-1 py-2 bg-gold-gradient rounded-lg text-sm font-bold text-dark-900 hover:shadow-glow-gold transition-all group-hover:scale-105"
+                    >
+                      Execute
+                    </button>
+                  </div>
                 </div>
-                <button className="w-full mt-3 py-2 bg-gold-gradient rounded-lg text-sm font-bold text-dark-900 hover:shadow-glow-gold transition-all">
-                  Execute Arb
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* AI Recommendations */}
       {mockAIRecommendations.length > 0 && (
-        <div className="bg-dark-800/50 border border-dark-700 rounded-xl p-5">
+        <div className="bg-dark-800/50 border border-dark-700 rounded-xl p-5 relative overflow-hidden">
+          {/* Premium badge */}
+          <div className="absolute top-3 right-3 px-2 py-1 bg-gold-gradient rounded-full text-[10px] font-bold text-dark-900 flex items-center space-x-1">
+            <Sparkles className="h-3 w-3" />
+            <span>PRO</span>
+          </div>
+
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <Sparkles className="h-5 w-5 text-primary-400" />
-              <h2 className="text-lg font-bold text-dark-100">AI-Powered Picks</h2>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-primary-500/20 rounded-lg">
+                <Sparkles className="h-5 w-5 text-primary-400" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <h2 className="text-lg font-bold text-dark-100">AI-Powered Picks</h2>
+                  <Tooltip content="Machine learning models analyze thousands of data points to find value bets">
+                    <span className="cursor-help">ℹ️</span>
+                  </Tooltip>
+                </div>
+                <p className="text-xs text-dark-400 mt-0.5">Based on advanced ML models</p>
+              </div>
             </div>
-            <button className="text-sm text-primary-400 hover:text-primary-300 font-medium">
-              View All →
+            <button
+              onClick={() => showToast('info', 'AI Picks', 'View all AI recommendations in the AI Picks page')}
+              className="text-sm text-primary-400 hover:text-primary-300 font-medium flex items-center space-x-1"
+            >
+              <span className="hidden sm:inline">View All</span>
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {mockAIRecommendations.map((rec) => (
               <div
                 key={rec.id}
-                className="bg-dark-900/50 rounded-lg p-4 border border-primary-800/30 hover:border-primary-700/50 transition-all cursor-pointer"
+                onClick={() => showToast('success', 'Pick Added!', `${rec.pick} added to your watchlist`)}
+                className="bg-dark-900/50 backdrop-blur-sm rounded-lg p-4 border border-primary-800/30 hover:border-primary-700/50 transition-all cursor-pointer group hover:scale-[1.02]"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="text-xs text-dark-400 uppercase mb-1">{rec.sportType}</div>
-                    <h3 className="text-sm font-bold text-dark-100 mb-1">{rec.event}</h3>
-                    <p className="text-xs text-primary-400 font-medium">{rec.pick}</p>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <span className="text-xs text-dark-400 uppercase font-bold">{rec.sportType}</span>
+                      {rec.confidence >= 75 && (
+                        <span className="px-1.5 py-0.5 bg-primary-500/20 text-primary-400 text-[10px] font-bold rounded">
+                          HIGH CONFIDENCE
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-sm font-bold text-dark-100 mb-1 group-hover:text-primary-400 transition-colors">
+                      {rec.event}
+                    </h3>
+                    <p className="text-sm text-primary-400 font-bold">{rec.pick}</p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-xs text-dark-400">Confidence</div>
-                    <div className="flex items-center space-x-1">
-                      <div className="text-lg font-bold text-primary-400">{rec.confidence}%</div>
-                      <div className="h-2 w-12 bg-dark-800 rounded-full overflow-hidden">
+                  <div className="text-right ml-3">
+                    <div className="flex items-center space-x-1 justify-end mb-1">
+                      <span className="text-xs text-dark-400">Confidence</span>
+                      <Tooltip content={`AI model is ${rec.confidence}% confident in this pick`}>
+                        <span className="cursor-help text-xs">ℹ️</span>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="text-2xl font-bold text-primary-400">{rec.confidence}%</div>
+                      <div className="h-2 w-16 bg-dark-800 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-primary-400"
+                          className="h-full bg-primary-400 transition-all duration-1000"
                           style={{ width: `${rec.confidence}%` }}
                         ></div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-dark-300 mb-3">{rec.reasoning}</p>
+
+                <p className="text-xs text-dark-300 mb-3 line-clamp-2">{rec.reasoning}</p>
+
                 <div className="flex items-center justify-between text-xs pt-3 border-t border-dark-800">
-                  <span className="text-dark-400">EV: +{rec.expectedValue}%</span>
-                  <span className="text-gold-400">{formatOdds(rec.recommendedOdds)}</span>
+                  <div className="flex items-center space-x-3">
+                    <div>
+                      <span className="text-dark-500">EV: </span>
+                      <span className="text-primary-400 font-bold">+{rec.expectedValue}%</span>
+                    </div>
+                    <div>
+                      <span className="text-dark-500">Odds: </span>
+                      <span className="text-gold-400 font-bold">{formatOdds(rec.recommendedOdds)}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      showToast('success', 'Copied!', 'Pick copied to clipboard');
+                    }}
+                    className="p-1.5 bg-dark-800 hover:bg-dark-700 rounded transition-colors"
+                  >
+                    <Copy className="h-3.5 w-3.5 text-dark-300" />
+                  </button>
                 </div>
               </div>
             ))}
